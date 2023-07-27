@@ -1,0 +1,24 @@
+# Vælg det .NET SDK-billede, du har brug for til at bygge din applikation
+FROM mcr.microsoft.com/dotnet/sdk:5.0 AS build
+
+# Angiv arbejdsmappen inde i containeren
+WORKDIR /app
+
+# Kopier projektets filer til arbejdsmappen
+COPY . .
+
+# Gendan afhængighederne og byg applikationen
+RUN dotnet restore
+RUN dotnet build --configuration Release --output ./out
+
+# Angiv det runtime-billede, der bruges til at køre applikationen
+FROM mcr.microsoft.com/dotnet/runtime:5.0 AS runtime
+
+# Angiv arbejdsmappen inde i runtime-containeren
+WORKDIR /app
+
+# Kopier output fra build-containeren til runtime-containeren
+COPY --from=build /app/out .
+
+# Angiv kommando, der skal udføres, når containeren startes
+CMD ["dotnet", "your_app.dll"]
