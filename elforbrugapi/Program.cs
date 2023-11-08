@@ -1,33 +1,22 @@
 ﻿using Newtonsoft.Json.Linq;
-using System;
-using System.Net.Http;
-using System.Net.NetworkInformation;
 using System.Text;
 using MySqlConnector;
-using System.Security.Cryptography;
-using Microsoft.VisualBasic;
 using System.Globalization;
-using System.Collections.Generic;
 using Newtonsoft.Json;
 
 class Program
 {
-    //class AccessTokenResponse
-    //{
-    //    public string? access_token { get; set; }
-        
-    //}
 
     static async Task Main()
     {
-        string jwtRefreshToken = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ0b2tlblR5cGUiOiJDdXN0b21lckFQSV9SZWZyZXNoIiwidG9rZW5pZCI6Ijk0OGNhZTBkLWM2OGEtNGNkNi05OGQ3LTk3NWI5Nzc1Mjg5NyIsIndlYkFwcCI6IkN1c3RvbWVyQXBwIiwidmVyc2lvbiI6IjIiLCJpZGVudGl0eVRva2VuIjoiNnIwQi9LeC96M1lBYmlQNThqUCtXR2NKVjJlV1FRVWpWRlRYenJ3NUNkRlRzdmE1TGEwdXNWeldzNG80WHRKdFBTdVc3Tk5hSXBsY3BXb1BWVDlXZ0drV2pvSXdQeXhCMkZ5aHpBZjhmWUhsb3BXZlZYRHRhUE50N25obVBtYm1Ndkh3WHBoY0pxVCs4anhxSDJWZzh5Zk5haU5LUGZWd29RYk5QQTM3bTRhT0RkaEIvNmVXNEdFZGp4eHZpVEp5b2t3WHNuMCtKb1hBM1dZQzR1bWtQNEp0cVVIMXB5SlEydEpRK2pnWkxtNjhZbThCQTJOMlFwZ3l2M1g5VzRUelVIYWV1endmUWVoOVZZWXh2SWlZcWtwSEtlN0NvVVQ5Uks1a1B5ZXFyR04yZlppSXJWakY4bms2TGpvNTBnaEZrK0FHN1c0SGpCbGFoTy9UeEMxVThGbHpNMjFlZW92c2JjbFg5YTJYK1VHK2l5b0VsMzk1YUFFZndRcDNYWk4xdmx3QTU0ckpnRHZRQlVLU1VSbmVoVjc5M2FlU3pBYXBTNGp3ZHVuZGxDakFsTlVtRVM3Tmx3QkphYTBYUlFwbnZramFwSlRkZG00cEJmRDFEZ0grcUtJYVdvWXlKODIwbnVuQjZFRlNIV0o5emdDaGhzKzZmbS9tbCtxVWhCS2luY3BPd2crNkpZYnB5WDNEZXBkNVI0QmlSbDEvWU1Ra0dWcmtDMEtVNWJ6VVBqSVg1UTFDdTJOaHJNZEVIK3RYUmVZSDhrbUFnKzVhdTlob1ZJWTdJUG9NK2IyTmZFWll2QVhCK1I2ZzJUZWpwSStpOEZUU1NpVkVGWkMwMGhyQTlGV1EyV2NvbVJoSVRmek8yMDRDMmNCSk9LdUt4amhWU09rV0VObkxUTUp1L2RNNld2QTZnWVdDc2RucUwzQWc4RU1tc0pEQmRLNmY2elpuRFFNOWhLV21qK1BRNXZ1M1JsOW8zb3hROWdSdVljK1MvZ3JaZXJLcjQ1SkthWE83bkdmKy9IdzJyb2J2RjR0OHI0OHFKY0RiQ3Y4d3JRdS83TGZoTmhIRXBxb0tnTVdnN2UrbXJpMm1lM1lTOTdUVzRCVFROQXhVODZBQ1hzUkdGOHVaUktYdkEwZDdWMDRTanFiZFlhM3lodU1RUStKWE0xUXh5UExyT3gzQnBYM3ZPK1g3UHRjUStDQUkxM2xRWWhlQnZJR2lHa0lObmZoRVRKZXBOVHRMS0lidFU2cFNTV1JYQXlqR25IVUpZbk5iOXdjb01uaDVQZnY4T2M3OUtDUHVWNXA5dDBaMlZRNGtGcmV6T1U3TUQ2U09uWEljdFJqL2QwSmNidmU4dG9SQXV3UjFoSHB2WGd5MzdZWHZMYzc3a3pBTmhBTm5wU1hjaDY3c013VnY2aHBncERscVpwc1gyZ0ZUWE5HQnVBTnplRlRURHhBd21DdnRHd2tyYzdDcUplYVhMR0JOTG42QkZzRU1ldXEyOG9ScUw4bklQWUt3V1ZiRXBCcS9QQ012bHdRV29ob1llcGx5cFcxUWdsK2RCcTBqZXI2NDJMaytKNEJaV2NNSk8zaHZtVlJRYVBMc3hnbjB0R3poYWpDRmQxaEpXdHRHZ3NVM2ZvcmNUdWhJcXhpTlA1cnpKQUg1WkpnYVc4S0hqV0xjRURpR1hHRGJKT0cwbzQ1bmdUaEVZSzkycGtpaHNDYnR4dzg1MmVrV1p0dGhCY0FrRG5aK09kKzZTQzROb0RjUEc2VHZkOUFJYy94SWVIcEV4Zy9yempOS3BIZkd4SzgvZis5bVVJelJxek1kOVR5dk9ScUU2ZEFIajB0ei85d01GTHJyRTZZTjJNajB6Qk9PSDU2OHBGRXVzRFlLd2Z3dEtJelphVTJrNHIrbVRrM1pLeUlJVitpMStIQlcrcFNVV25hN2JWZm55aHdRdEFLOFE1MkowV1hWV2sxMXpnazEwOG9vTWhvTVFkeUVrcnZzbWd1TTc1L3BwQkJmRTZxTWp2Sld5U0VnRG9vUkFNNzdkeHFRalhPeXpOSFBwckh4b0JzVVI5S3Y4bnJCZjZIekxGcExaZXNaU3JuYlIwYzYrT0pRQzVydEJqOUFpU3V2eTBudWNBQ0RzUEVVYWVYR2pwMGpHd1pUVStmQXhUNlJCeHI2OG5PQjNaUlBPVzFLYkxXcXhUT2F2QzdpVHhtZmhsT2NWWFEvMkt3RG1oZUpncC9FNE5aUHloOHd0UTRnN0RtTzBrbVVNb0U3RmsvNlJMMzV2VUdvZmlwZmtWVjZlTE1lVXRLUkl2SHN6akhLcVVJdnpCMHIzdlVzblJzSm5MV2VId242U3FHS1Iyemc2MU9WejB5Q0hQejdVRkJ3d3REOXdlQ2YyT2tscEtUdmJtQkxicUNra1NBbFp6TzU3NFRQU2U3elZJZ3lsbEV6YVY4ZDN3ampZdjVySFJ1QmxOVkZiQTRsQ0xHK0ZvR3draUFKUCttcklQL3A4aTlNdGhmUkgwRWViaVEzdk02MTJDRDFuOUVUTG8rV09JNG1RK2dYIiwiaHR0cDovL3NjaGVtYXMueG1sc29hcC5vcmcvd3MvMjAwNS8wNS9pZGVudGl0eS9jbGFpbXMvbmFtZWlkZW50aWZpZXIiOiJQSUQ6OTIwOC0yMDAyLTItODA2NjMxMDc4MzE5IiwiaHR0cDovL3NjaGVtYXMueG1sc29hcC5vcmcvd3MvMjAwNS8wNS9pZGVudGl0eS9jbGFpbXMvZ2l2ZW5uYW1lIjoiSmVzcGVyIEtqw6ZyIFBlZGVyc2VuIiwibG9naW5UeXBlIjoiS2V5Q2FyZCIsInBpZCI6IjkyMDgtMjAwMi0yLTgwNjYzMTA3ODMxOSIsImIzZiI6ImFsbU9LRTBpOWUwT0ZsaWcvWXVLbmVvd0xhRGdXMVdINHowLzFFSnZUMU09IiwidXNlcklkIjoiNzgzNTI0IiwiZXhwIjoxNzIwNTA2NTU5LCJpc3MiOiJFbmVyZ2luZXQiLCJqdGkiOiI5NDhjYWUwZC1jNjhhLTRjZDYtOThkNy05NzViOTc3NTI4OTciLCJ0b2tlbk5hbWUiOiJFbEZvcmJydWciLCJhdWQiOiJFbmVyZ2luZXQifQ.jYUm7LYuj4sMzRTb6Y6S5sPQdPMqDqMqKuj8gxarZHo";
+        string jwtRefreshToken = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ0b2tlblR5cGUiOiJDdXN0b21lckFQSV9SZWZyZXNoIiwidG9rZW5pZCI6ImQyZjAwOTBmLWM0ZjAtNGZiYi04ZWE4LWU0ZmM0M2QyNDYxMSIsIndlYkFwcCI6IkN1c3RvbWVyQXBwIiwidmVyc2lvbiI6IjIiLCJpZGVudGl0eVRva2VuIjoieWF1WFVVKzRLQXh0c3VBN3JScE9UdUlCM0ErVHdNZ2l3TlNoODNWRmJwRWF2c3hBYUVhTGVIeWZMdlo5b2FVUnRXZUx3TGFLalNkc2tnOEZtMVdDUXlPUGhTek1SU21Pd1JXSnptVXdXZnIrRklpTlhkeFFVUVlGZEVZdUNCZnkyYkV6YWxycW1FOWw1UXYrVWpQRUpwVmhzN2hpK2s0VVhYalh3SHlxOGdzQ3NuQXkwYWJMWEpDTVV3YmUzcUNzT0J5ZjN0aDloRS9LZkxoQmpUbm1kQlkvWGxGSUcrNlRHRDRTZ1FacDNiSHhEdzV4eTRUQy9xWnk0ckkvU2t3b3FtNFVtVEdXaU90UkFxc0cwOUFUZ0hpSUJwMFJwaXlBQnR6NWJWa2hJZmg2T0tFeUJSMzc5V2h3Qy9XYkN6R21URGpsZTZSRTh6d2MyTlNpZ3pSbFJscDQ2a3ZEOGJQRFpxbXpmWnRpc2JRSkVyU0lzUklHaklBRlMzUUtSMGtqT2RsVHFUREovaStmM1Z1NkVYdFl1b1IrVFV0NXFuWmgycllmT28vQXhmRDVBZFFubXlTNkI5L2VQL2pTM2o1ZzVnUHVMTUFOZ2tOOUdPdGZzMUhLSUoyaXdaeE4xdlVZZklQcjVyRkprNlp3eHVBTU9jNGhuM2tTOStTMm1WYVQwbGVVSnpadTV0NFR4MmZ0SDBHTVFpbGl5QjVRRnBZRGozTGlaOXNTQUMycDZJTFVrYU5aMGgyNEJzTlNhbWxqbmlxTHUzWldpMG5ObSs3c2VOUy9wR3JmSi9UWVE0WEhJd3gyWVN1M0lORUFiTDhtYmJBTnZ5c1E4ZlJlSFdla21GS294ZjloRnJGdmZDelhFU3lJdU0vSWlUM1U1dDVucUFuYWJsd0RaL3NHUGZJc3NkcVF0RFhrLzBxUHBwM1lOOTZBR3BQT1Rhb1dTZnlPTURPb1JZZGZid3VBOEI5MGhlazdDL01nU0VIV2VKQUtVc01wZjYyYks0WlQ3TXN5ZjQzbHQ0NlR3blpnYjgxaFZaWDk1V1Q3d2ZZREFXemhRTDQ4M21mYWhVbEl0bXpNQklYT24xV3RraG44SmlvTVRvdTZmdUh5Mzl1OEhDNnN5OVBjeEl4NUpTdmlkdm05YTllVUh6dFVxVS8wUkdSRWE0czhUTytqdFlpNzh6VktaWFBML3dWZENWNVF0UytiaE9jazJyeUpidUdmWHQxYnFGSTg0bTNqQ1JVQ0c2QVdLMG94eEFBblJ3aHo1WUV2NVpmYnIxK2ZiRHZBbjlzVWpESzdqUUcrRDh5Z0NzUVZsZHdla2FKb2RYV2ZMZTNDam1MQlU2cytlVkd5WnFJQXlLWGJWZURWcWt0dXZtRHpxNVhVZm1sZFV6dHA2Wnk1ZFBqOFVNWWJtYTcxL0YxRHBIK1I5VE13dHgwblMvTFJHWnUwdEpaZlJ3a3c4N0VWWE1WS2lmL1pDTjFOMmEyeVFYMXRVWjJoTmJoRkt1ZUxCTzlkL1E4NGhLTEZJVlhjUlFQVFBGZVNXcVdqdDB2MUk1RVBmazZ0N21UWmdPY1NJRXBJZWFoZmZDWWxsU0VweTFCL005TlR3WmFnVCs1bDl4VStGeWFaRGo4OSt6L1F0KzJDckVPcndFdzhyd1ZzMHI3elNpajBvVnVKbkZCVE5jZlFyOXB1T3IwTzBXYXdSb2gzdzBuU2UxTitxLzFBZlBIVkxSVVFCRlF5Um16MVJzc3M3MWR2N3FpVFNtOHhFRlI1b2lSSHJtbm1ScUlveHArbDZ4NGRvZlFIYW9rVjlYMTZnMUU4WGVwd0FHbXFrLy92WU0xN1o2Z1NRVE9tRmYyd3lsbkp4NW5YR1BOeFM1VzkxWTNJaWpYVHE4eDhRcFFSUGNjTnJ3N2I0dzFFcEQzMHVVN0xGZkhpQVRiTVAzNlFGOWd4M3pqWXBRWkc4MVVCMEhsOXdJNnZENkY3aE1YTUFZdUpibzR4MEJkdDFzT2w3d1VBNGJUcFRjbmJMNU9SeEdFRHZIZWp0V0xTeEtiWlRJRXN6eFNhcjcvVUNrazZhMnFtVVVXOHZadEZUSFIzdjlMUFhiSzhuSVZqeHZnNzFTc0cxU3ZTNXQ0NFlhRVRzdm1XYks5aHgvNFJIVnhxdzNTWGlBc204VEtibEFTRXVSbWhmS0Q1WEJ6M1lLRzdkdDM3L2dXR0M1UFRTYVNzL1FoNzl3aFRjek9iSWRyb2k1YWtvZXZiNzR4ZW5IQXRuMi9iRHRQeExEc2xwVHM3R293YnBEZVhkeEdCcXoxY3UybHlreWVFc2JYRVdLY0FFejBCYmVUSlR6L2xvK0xHRDU3eVE0L2luUkg4SXhZQ2Exc1ZwbkNNRlAwN3RDL09ZVW1kamM3Q0Zjb3gzVDdjbVFzZW9XN2s0Q0JnUGxRYmRab0ZDZ1YrOXNJMVowcHoxZ3pKVDg1TW8wOC9IVzR0eS8wcmk0VHMyM0xBWlYyM2J1WCtIQ0ZEa2tIbEVhaWpIblBoWEc5WkhIcVloNjFLQ0U0T0pXUVRSQ1ZwIiwiaHR0cDovL3NjaGVtYXMueG1sc29hcC5vcmcvd3MvMjAwNS8wNS9pZGVudGl0eS9jbGFpbXMvZ2l2ZW5uYW1lIjoiSmVzcGVyIEtqw6ZyIFBlZGVyc2VuIiwibG9naW5UeXBlIjoiS2V5Q2FyZCIsImIzZiI6InkwTjB4OHBvcHM3VGJ3RmlsMWFSZkZYNTZPYitoNHpva0VyRy9TQ203eGs9IiwicGlkIjoiUElEOjkyMDgtMjAwMi0yLTgwNjYzMTA3ODMxOSIsInVzZXJJZCI6Ijc4MzUyNCIsImh0dHA6Ly9zY2hlbWFzLnhtbHNvYXAub3JnL3dzLzIwMDUvMDUvaWRlbnRpdHkvY2xhaW1zL25hbWVpZGVudGlmaWVyIjoiUElEOjkyMDgtMjAwMi0yLTgwNjYzMTA3ODMxOSIsImV4cCI6MTczMDk3Mjc0MCwiaXNzIjoiRW5lcmdpbmV0IiwianRpIjoiZDJmMDA5MGYtYzRmMC00ZmJiLThlYTgtZTRmYzQzZDI0NjExIiwidG9rZW5OYW1lIjoibnkgYXBpIHRva2VuIiwiYXVkIjoiRW5lcmdpbmV0In0.IDelG0YmMKAmFIMqKe1OPos7wkNhbN0lYpSApuyRJYQ";
         string tokenEndpoint = "https://api.eloverblik.dk/customerapi/api/token";
         string meteringPointId = "571313105290375527";
         string connectionString = "Server=192.168.1.182; Port=3306; Database=powerConsumption_DB; Uid = root;Pwd = 2xeM!*N44^yF";
 
-        // Finder datoen for i forgårs som er det nyeste data der kan hentes.
-        DateTime yesterday = DateTime.Today.AddDays(-2);
-        DateTime today = DateTime.Today.AddDays(-1);
+        // Finder start og slut dato.
+        DateTime startDate = DateTime.Today.AddDays(-2);
+        DateTime endDate = DateTime.Today.AddDays(-1);
 
 
         using (HttpClient client = new HttpClient())
@@ -43,22 +32,19 @@ class Program
                 string responseContent = await response.Content.ReadAsStringAsync();
                 dynamic tokenData = JsonConvert.DeserializeObject(responseContent);
                 string accessToken = tokenData.result;
-                //Console.WriteLine("Access Token: " + accessToken);
 
-                //***********Her kommer den næste funktion
                 // Tilføj access token til anmodningens header
-                //client.DefaultRequestHeaders.Add("Authorization", $"Bearer {accessToken}");
                 client.DefaultRequestHeaders.Authorization = new System.Net.Http.Headers.AuthenticationHeaderValue("Bearer", accessToken);
 
                 // Opret anmodningens krop (request body)
                 string requestBody = $"{{ \"meteringPoints\": {{ \"meteringPoint\": [ \"{meteringPointId}\" ] }} }}";
                 StringContent content = new StringContent(requestBody, Encoding.UTF8, "application/json");
 
-                string apiurl = $"https://api.eloverblik.dk/customerapi/api/meterdata/gettimeseries/{yesterday:yyyy-MM-dd}/{today:yyyy-MM-dd}/Day";
+                string apiurl = $"https://api.eloverblik.dk/customerapi/api/meterdata/gettimeseries/{startDate:yyyy-MM-dd}/{endDate:yyyy-MM-dd}/Day";
 
 
                 // Send POST-anmodning til API'en
-                HttpResponseMessage response2 = await client.PostAsync($"https://api.eloverblik.dk/customerapi/api/meterdata/gettimeseries/{yesterday:yyyy-MM-dd}/{today:yyyy-MM-dd}/Day", content);
+                HttpResponseMessage response2 = await client.PostAsync($"https://api.eloverblik.dk/customerapi/api/meterdata/gettimeseries/{startDate:yyyy-MM-dd}/{endDate:yyyy-MM-dd}/Day", content);
 
                 // Håndter API-svaret
                 if (response2.IsSuccessStatusCode)
@@ -70,63 +56,59 @@ class Program
                     JObject jsonObject = JObject.Parse(apiResponse);
 
                     // Find værdierne for "period.timeInterval" start og end
-                    JToken startTimeToken = jsonObject["result"]?[0]?["MyEnergyData_MarketDocument"]?["period.timeInterval"]?["start"];
+                    //JToken startTimeToken = jsonObject["result"]?[0]?["MyEnergyData_MarketDocument"]?["period.timeInterval"]?["start"];
                     JToken endTimeToken = jsonObject["result"]?[0]?["MyEnergyData_MarketDocument"]?["TimeSeries"]?[0]?["Period"]?[0]?["timeInterval"]?["end"];
                     JToken quantityToken = jsonObject["result"]?[0]?["MyEnergyData_MarketDocument"]?["TimeSeries"]?[0]?["Period"]?[0]?["Point"]?[0]?["out_Quantity.quantity"];
 
-                    if (startTimeToken != null && quantityToken != null)
+                    if (endTimeToken != null && quantityToken != null)
                     {
-                        string startTimeString = startTimeToken.Value<string>();
-                        DateTime startTime = DateTime.Parse(startTimeString);
+                        CultureInfo culture = CultureInfo.InvariantCulture;
+                        string format = "MM/dd/yyyy HH:mm:ss";
+                        DateTime endTime;
                         string endTimeString = endTimeToken.Value<string>();
-                        DateTime endTime = DateTime.Parse(endTimeString);
-                        //string forbrug = quantityToken.Value<string>();
 
                         string quantityValueString = quantityToken.Value<string>();
-                        CultureInfo culture = CultureInfo.InvariantCulture;
 
-                        if (decimal.TryParse(quantityValueString, NumberStyles.Float, culture, out decimal quantityValue))
+                        if (DateTime.TryParseExact(endTimeString, format, CultureInfo.InvariantCulture, DateTimeStyles.None, out endTime))
                         {
-                            //HAr udkommenteret linjen da det ikke er nødvendig med en success besked.
-                            Console.WriteLine("Aflæst forbrug: " + quantityValue);
+                            //Console.WriteLine("Aflæsnings dato: " + endTime);
+
+                            if (decimal.TryParse(quantityValueString, NumberStyles.Float, culture, out decimal quantityValue))
+                            {
+                                //Console.WriteLine("Aflæst forbrug: " + quantityValue);
+
+                                using (MySqlConnection connection = new MySqlConnection(connectionString))
+                                {
+                                    connection.Open();
+
+                                    // Indsæt data i MySQL-databasen
+                                    string insertQuery = "INSERT INTO forbrug (dato, forbrug) VALUES (@dato, @forbrug)";
+                                    MySqlCommand command = new MySqlCommand(insertQuery, connection);
+                                    command.Parameters.AddWithValue("@dato", endTime);
+                                    command.Parameters.AddWithValue("@forbrug", quantityValue);
+                                    command.ExecuteNonQuery();
+
+                                    connection.Close();
+                                    Console.WriteLine("Data aflæst og gemt i db:");
+                                    Console.WriteLine($"Dato: {endTime}");
+                                    Console.WriteLine("Kwh " + quantityValue);
+                                }
+                            }
                         }
                         else
                         {
-                            Console.WriteLine("Noget gik galt i konveteringen til decimal");
+                            Console.WriteLine("Noget gik galt i konveteringen af data");
                         }
-
-
-                        // Opret forbindelse til MySQL-databasen
-                        using (MySqlConnection connection = new MySqlConnection(connectionString))
-                        {
-                            connection.Open();
-
-                            // Indsæt data i MySQL-databasen
-                            string insertQuery = "INSERT INTO forbrug (dato, forbrug) VALUES (@dato, @forbrug)";
-                            MySqlCommand command = new MySqlCommand(insertQuery, connection);
-                            command.Parameters.AddWithValue("@dato", endTime);
-                            command.Parameters.AddWithValue("@forbrug", quantityValue);
-                            command.ExecuteNonQuery();
-
-                            connection.Close();
-                            Console.WriteLine("Data er skrevet til db");
-                        }
-
-                        Console.WriteLine($"Dato: {endTime}");
-                        Console.WriteLine("Decimal " + quantityValue);
-                        Console.WriteLine("Værdierne blev gemt i databasen");
-
                     }
-
                 }
             }
-            else 
+            else
             {
                 Console.WriteLine("Fejl ved hentning af access token: " + response.ReasonPhrase + " Response Content " + response.Content);
                 Console.ReadLine();
             }
         }
-        
+
 
 
     }
