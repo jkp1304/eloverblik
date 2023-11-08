@@ -1,24 +1,25 @@
-# Vælg det .NET SDK-billede, du har brug for til at bygge din applikation
-FROM mcr.microsoft.com/dotnet/sdk:5.0 AS build
+# Vælg .NET 6.0 runtime-billede til at bygge appen
+FROM mcr.microsoft.com/dotnet/runtime:6.0 AS build
 
-# Angiv arbejdsmappen inde i containeren
+# Opret en midlertidig mappe
+WORKDIR /temp
+
+# Kopier elforbrugapi.dll og runtime-konfigurationsfiler til den midlertidige mappe
+COPY elforbrugapi.deps.json .
+COPY elforbrugapi.dll .
+COPY elforbrugapi.pdb .
+COPY elforbrugapi.runtimeconfig.json .
+COPY MySqlConnector.dll .
+COPY Newtonsoft.Json.dll .
+
+# Vælg .NET 6.0 runtime-billede til at køre din applikation
+FROM mcr.microsoft.com/dotnet/runtime:6.0 AS runtime
+
+# Opret arbejdsmappe i runtime-containeren
 WORKDIR /app
 
-# Kopier projektets filer til arbejdsmappen
-COPY . .
-
-# Gendan afhængighederne og byg applikationen
-RUN dotnet restore
-RUN dotnet build --configuration Release --output ./out
-
-# Angiv det runtime-billede, der bruges til at køre applikationen
-FROM mcr.microsoft.com/dotnet/runtime:5.0 AS runtime
-
-# Angiv arbejdsmappen inde i runtime-containeren
-WORKDIR /app
-
-# Kopier output fra build-containeren til runtime-containeren
-COPY --from=build /app/out .
+# Kopier DLL-filen og runtime-konfigurationsfilerne fra build-containeren til runtime-containeren
+COPY --from=build /temp .
 
 # Angiv kommando, der skal udføres, når containeren startes
-CMD ["dotnet", "your_app.dll"]
+CMD ["dotnet", "elforbrugapi.dll"]
